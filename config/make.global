@@ -1,0 +1,34 @@
+# make path
+export MAKE := "make"
+
+# make flag
+MAKEFLAG := -s --no-print-directory
+
+# compile marcro
+CC := g++
+
+# include path
+INCLUDE_PATH := /home/pi/srv/include
+
+# compile flags
+CCFLAG := -g -I$(INCLUDE_PATH)
+OBJCCFLAG := -g -c -I$(INCLUDE_PATH) -std=c++11
+
+# recursive make and clean
+.PHONY: build-subdirs
+build-subdirs: $(DIRS)
+
+.PHONY: $(DIRS)
+$(DIRS):
+	@$(MAKE) $(MAKEFLAG) -C $@ all
+	
+.PHONY: clean-subdirs
+clean-subdirs:
+	@for dir in $(DIRS); do \
+		$(MAKE) $(MAKEFLAG) -C $$dir clean; \
+	done
+
+# dependencies
+%.o: %.c*
+	@echo " " CC "\t" $< -o $@
+	@$(CC) $(OBJCCFLAG) $< -o $@
