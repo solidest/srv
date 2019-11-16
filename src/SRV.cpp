@@ -212,7 +212,7 @@ void cmdPing(Client& c, vector<sds>& ci) {
 
 //state
 void cmdState(Client& c, vector<sds>& ci) {
-    cout << "state(" << ci.size()-1 << ")" << endl;
+    //cout << "state(" << ci.size()-1 << ")" << endl;
     CheckArgSize(1);
     sds args[] = {sdsnew(CTX::WorkTypeStr()), sdscatfmt(sdsempty(), "%i", CTX::WorkProjectId())};
     c.AppendReplyBuf(args, 2);
