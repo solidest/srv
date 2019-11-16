@@ -5,7 +5,7 @@
 ** Login   <solidest>
 **
 ** Started on  undefined Nov 10 7:17:57 PM 2019 solidest
-** Last update Mon Nov 10 8:38:08 PM 2019 solidest
+** Last update Sun Nov 16 4:07:02 PM 2019 solidest
 */
 
 #ifndef CTX_H_
@@ -39,6 +39,7 @@ class CTX {
         static const char* WorkTypeStr();
         static const uint32_t WorkType() { return _work_type; }
         static const int WorkProjectId() { return _proj_id; }
+        static atomic_uint32_t _work_type;
 
 
     private:
@@ -48,7 +49,7 @@ class CTX {
         static atomic_ullong _now;
         static int _maxStep;
 
-        static atomic_uint32_t _work_type;
+        //static atomic_uint32_t _work_type;
         static int _proj_id;
 };
 

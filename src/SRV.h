@@ -5,7 +5,7 @@
 ** Login   <>
 **
 ** Started on  Fri Nov 15 9:02:15 AM 2019 solidest
-** Last update Sat Nov 15 9:06:22 AM 2019 solidest
+** Last update Sun Nov 16 1:16:34 PM 2019 solidest
 */
 
 #ifndef SRV_H_
@@ -45,9 +45,10 @@ void cmdExit(Client& c, vector<sds>& ci);
 void cmdNil(Client& c, vector<sds>& ci);
 void cmdPrepare(Client& c, vector<sds>& ci);
 void cmdStartCase(Client& c, vector<sds>& ci);
-void cmdPause(Client& c, vector<sds>& ci);
-void cmdContinue(Client& c, vector<sds>& ci);
+void cmdPauseCase(Client& c, vector<sds>& ci);
+void cmdContinueCase(Client& c, vector<sds>& ci);
 void cmdStopCase(Client& c, vector<sds>& ci);
+void cmdClear(Client& c, vector<sds>& ci);
 
 //helper
 void InitialCmds();

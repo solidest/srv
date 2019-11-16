@@ -47,7 +47,7 @@ void *loop(void* arg)
     pthread_exit(NULL);
 }
 
-int main(int argcs, char **argvs) {
+int main1(int argcs, char **argvs) {
     pthread_t tid;
     auto ret = pthread_create(&tid,NULL,loop,NULL);
     sleep(1);
@@ -65,7 +65,7 @@ int main(int argcs, char **argvs) {
     return 0;
 }
 
-int main1(int argcs, char **argvs) {
+int main(int argcs, char **argvs) {
     StartServer("0.0.0.0", 1210);
     return 0;
 }

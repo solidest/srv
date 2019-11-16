@@ -26,11 +26,12 @@ struct CommandInfo cmdTable[] = {
     {"ping", cmdPing, WORK_TYPE_ALL },
     {"state", cmdState, WORK_TYPE_ALL },
     {"exit", cmdExit, WORK_TYPE_ALL },
-    {"prepear", cmdPrepare, WORK_TYPE_IDLE | WORK_TYPE_PREPARED },
+    {"prepare", cmdPrepare, WORK_TYPE_IDLE | WORK_TYPE_PREPARED },
     {"start", cmdStartCase, WORK_TYPE_PREPARED },
-    {"pause", cmdPause, WORK_TYPE_RUNNING },
-    {"continue", cmdContinue, WORK_TYPE_PAUSE },
-    {"stop", cmdStopCase, WORK_TYPE_RUNNING | WORK_TYPE_PAUSE }
+    {"pause", cmdPauseCase, WORK_TYPE_RUNNING },
+    {"continue", cmdContinueCase, WORK_TYPE_PAUSE },
+    {"stop", cmdStopCase, WORK_TYPE_RUNNING | WORK_TYPE_PAUSE },
+    {"clear", cmdClear, WORK_TYPE_PREPARED }
 };
 
 
@@ -179,14 +180,13 @@ void OnAfterSend(uv_write_t* req, int status) {
 void ExecCommand(Client& c, vector<sds>& ci) {
     auto cmdi = _cmdsTable.find(ci.front());
     if(cmdi != _cmdsTable.end()) {
-        auto cmd = cmdi->second;
-        if((cmd->allowMode & CTX::WorkType()) == 0) {
-            char buff[800];
-            sprintf(buff, "invalid command, because stBox state is %s", CTX::WorkTypeStr());
-            throw runtime_error(buff);
-        }
-
         try {
+            auto cmd = cmdi->second;
+            if((cmd->allowMode & CTX::WorkType()) == 0) {
+                char buff[800];
+                sprintf(buff, "invalid command, because now state is %s", CTX::WorkTypeStr());
+                throw runtime_error(buff);
+            }
             cmd->cmd(c, ci);
         }
         catch(const std::exception& e) {
@@ -200,6 +200,7 @@ void ExecCommand(Client& c, vector<sds>& ci) {
 
 //不支持的命令
 void cmdNil(Client& c, vector<sds>& ci) {
+    cout << "nil" << endl;
     c.AppendReplyBuf("-not supported command : %S (%u)\r\n", ci.front(), (unsigned int)ci.size()-1);
 }
 
@@ -211,6 +212,7 @@ void cmdPing(Client& c, vector<sds>& ci) {
 
 //state
 void cmdState(Client& c, vector<sds>& ci) {
+    cout << "state(" << ci.size()-1 << ")" << endl;
     CheckArgSize(1);
     sds args[] = {sdsnew(CTX::WorkTypeStr()), sdscatfmt(sdsempty(), "%i", CTX::WorkProjectId())};
     c.AppendReplyBuf(args, 2);
@@ -220,26 +222,43 @@ void cmdState(Client& c, vector<sds>& ci) {
 
 //exit all
 void cmdExit(Client& c, vector<sds>& ci) {
+    cout << "exit(" << ci.size()-1 << ")" << endl;
     uv_close((uv_handle_t*)c.Handle, OnClientClosed);
     uv_stop(_mainloop);
 }
 
 void cmdPrepare(Client& c, vector<sds>& ci) {
+    cout << "prepare(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_PREPARED;
     c.AppendReplyBufOk();
 }
 
 void cmdStartCase(Client& c, vector<sds>& ci) {
+    cout << "start(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_RUNNING;
      c.AppendReplyBufOk();
 }
 
-void cmdPause(Client& c, vector<sds>& ci) {
+void cmdPauseCase(Client& c, vector<sds>& ci) {
+    cout << "pause(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_PAUSE;
     c.AppendReplyBufOk();
 }
 
-void cmdContinue(Client& c, vector<sds>& ci) {
+void cmdContinueCase(Client& c, vector<sds>& ci) {
+    cout << "continue(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_RUNNING;
     c.AppendReplyBufOk();
 }
 
 void cmdStopCase(Client& c, vector<sds>& ci) {
+    cout << "stop(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_PREPARED;
+    c.AppendReplyBufOk();
+}
+
+void cmdClear(Client& c, vector<sds>& ci) {
+    cout << "clear(" << ci.size()-1 << ")" << endl;
+    CTX::_work_type = WORK_TYPE_IDLE;
     c.AppendReplyBufOk();
 }
